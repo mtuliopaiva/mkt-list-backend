@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Users, Prisma } from '@prisma/client';
-import { CreateUsersDto } from '../domain/dtos/create-users.dto';
+import { Users, Prisma, Category } from '@prisma/client';
+import { CreateCategoryDto } from '../domain/dtos/create-category.dto';
 import { PrismaService } from 'src/core/prisma/prisma.service';
-import { UpdateUsersDto } from '../domain/dtos/update-users.dto';
+import { UpdateCategoryDto } from '../domain/dtos/update-category.dto';
 
 @Injectable()
-export class UsersService {
+export class CategoryService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(data: CreateUsersDto): Promise<Users> {
-    return this.prisma.users.create({ data });
+  async createCategory(data: CreateCategoryDto): Promise<Category> {
+    return this.prisma.category.create({ data });
   }
 
-  async getUserByUuid(uuid: string): Promise<Users> {
+  async getCategoryByUuid(uuid: string): Promise<Category> {
     try {
-      return await this.prisma.users.findUnique({
+      return await this.prisma.category.findUnique({
         where: {uuid}
       })
     } catch (error) {
@@ -22,28 +22,27 @@ export class UsersService {
     }
   }
 
-  async getUserList(
+  async getCategoryList(
     page: number,
     itemsPerPage: number,
     search: string,
-  ): Promise<[Users[], number]> {
+  ): Promise<[Category[], number]> {
     const skip = (page - 1) * itemsPerPage;
     const take = itemsPerPage;
 
-    const query = this.prisma.users;
+    const query = this.prisma.category;
 
     try {
       const total = await query.count({
         where: {
           OR: [
             { name: { contains: search || '', mode: 'insensitive' } },
-            { email: { contains: search || '', mode: 'insensitive' } },
           ],
           deletedAt: null,
         },
       });
 
-      const users = await query.findMany({
+      const category = await query.findMany({
         orderBy: [
           {
             updatedAt: 'desc',
@@ -52,7 +51,6 @@ export class UsersService {
         where: {
           OR: [
             { name: { contains: search || '', mode: 'insensitive' } },
-            { email: { contains: search || '', mode: 'insensitive' } },
           ],
           deletedAt: null,
         },
@@ -60,51 +58,51 @@ export class UsersService {
         take: take,
       });
 
-      return [users, total];
+      return [category, total];
     } catch (error) {
       throw new Error(`Error fetching users: ${error.message}`);
     }
   }
 
 
-  async putUser(uuid: string, data: UpdateUsersDto): Promise<Users> {
+  async putCategory(uuid: string, data: UpdateCategoryDto): Promise<Category> {
     try {
-      return await this.prisma.users.update({
+      return await this.prisma.category.update({
         where: { uuid },
         data,
       });
     } catch (error) {
-      throw new Error(`Error updating user: ${error.message}`);
+      throw new Error(`Error updating category: ${error.message}`);
     }
   }
 
-  async restoreUser(uuid: string): Promise<Users> {
+  async restoreCategory(uuid: string): Promise<Category> {
     try {
-      const user = await this.prisma.users.findUnique({
+      const category = await this.prisma.category.findUnique({
         where: {uuid}
       });
 
-      if (!user || !user.deletedAt) {
+      if (!category || !category.deletedAt) {
         throw new NotFoundException('User not found or not deleted');
       }
 
-      return await this.prisma.users.update({
+      return await this.prisma.category.update({
         where: { uuid },
         data:{deletedAt: null}
       });
     } catch (error) {
-      throw new Error(`Error updating user: ${error.message}`);
+      throw new Error(`Error updating category: ${error.message}`);
     }
   }
 
-  async softDeleteUser(uuid: string): Promise<Users> {
+  async softDeleteCategory(uuid: string): Promise<Category> {
     try {
-      return await this.prisma.users.update({
+      return await this.prisma.category.update({
         where: { uuid },
         data: { deletedAt: new Date() },
       });
     } catch (error) {
-      throw new Error(`Error soft deleting user: ${error.message}`);
+      throw new Error(`Error soft deleting category: ${error.message}`);
     }
   }
 }

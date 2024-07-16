@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Put,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiTags, ApiQuery, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -21,6 +22,7 @@ import { UpdateUsersDto } from '../domain/dtos/update-users.dto';
 import { UpdateUsersCommand } from '../domain/commands/update-users.command';
 import { CreateUsersCommand } from '../domain/commands/create-users.command';
 import { DeleteUsersCommand } from '../domain/commands/delete-users.command';
+import { RestoreUsersCommand } from '../domain/commands/restore-users.command ';
 
 @ApiTags('Users')
 @Controller('users')
@@ -42,7 +44,7 @@ export class UsersController {
   }
 
   @Get('list')
-  @ApiOperation({ summary: 'Get user list' })
+  @ApiOperation({ summary: 'Get user list and search' })
   @ApiQuery({ name: 'page', type: Number, required: true, example: 1 })
   @ApiQuery({ name: 'itemsPerPage', type: Number, required: true, example: 20 })
   @ApiQuery({ name: 'search', type: String, required: false })
@@ -78,6 +80,16 @@ export class UsersController {
   ): Promise<ReadUsersDto> {
     return await this.commandBus.execute(
       new UpdateUsersCommand(uuid, updateUsersDto),
+    );
+  }
+
+  @Patch('restore')
+  @ApiOperation({ summary: 'Restore a user' })
+  @ApiQuery({ name: 'uuid', type: String, required: true })
+  @ApiResponse({ status: 200, description: 'The user has been successfully restored.', type: ReadUsersDto })
+  async restoreUser(@Query('uuid', ParseUUIDPipe) uuid: string): Promise<ReadUsersDto> {
+    return await this.commandBus.execute(
+      new RestoreUsersCommand(uuid),
     );
   }
 

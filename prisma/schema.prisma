@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -26,7 +20,7 @@ model Permissions {
   active      Boolean
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? 
+  deletedAt   DateTime?
   roles       Roles[]   @relation("RolePermissions")
 
   @@map("permissions")
@@ -39,7 +33,7 @@ model Roles {
   active      Boolean
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  deletedAt   DateTime? 
+  deletedAt   DateTime?
   permissions Permissions[] @relation("RolePermissions")
   users       Users[]
 
@@ -59,6 +53,59 @@ model Users {
   deletedAt       DateTime?
 
   roles Roles[]
+  lists List[]
 
   @@map("users")
+}
+
+model Category {
+  uuid      String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt       DateTime?
+
+
+  products Product[]
+}
+
+model Product {
+  uuid       String   @id @default(uuid()) @db.Uuid
+  name       String   @db.VarChar(255)
+  price      Float
+  categoryId String   @db.Uuid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt       DateTime?
+
+
+  category  Category   @relation(fields: [categoryId], references: [uuid])
+  listItems ListItem[]
+}
+
+model List {
+  uuid      String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(255)
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt       DateTime?
+
+
+  user      Users      @relation(fields: [userId], references: [uuid])
+  listItems ListItem[]
+}
+
+model ListItem {
+  uuid           String   @id @default(uuid()) @db.Uuid
+  quantity       Int
+  productId      String   @db.Uuid
+  shoppingListId String   @db.Uuid
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt       DateTime?
+
+
+  product        Product  @relation(fields: [productId], references: [uuid])
+  list           List     @relation(fields: [shoppingListId], references: [uuid])
 }

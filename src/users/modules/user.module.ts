@@ -9,10 +9,12 @@ import { CreateUsersHandler } from '../domain/commands/create-users.handler';
 import { UserByUuidHandler } from '../domain/queries/users-by-uuid.handler';
 import { UpdateUsersHandler } from '../domain/commands/update-users.handler';
 import { SoftDeleteUserHandler } from '../domain/commands/delete-users.handler';
+import { RestoreUsersHandler } from '../domain/commands/restore-users.handler';
 
 export const CommandHandlers = [
   CreateUsersHandler,
   UpdateUsersHandler,
+  RestoreUsersHandler,
   SoftDeleteUserHandler
 ];
 
