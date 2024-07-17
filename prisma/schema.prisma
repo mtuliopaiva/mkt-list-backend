@@ -59,53 +59,49 @@ model Users {
 }
 
 model Category {
-  uuid      String   @id @default(uuid()) @db.Uuid
-  name      String   @db.VarChar(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt       DateTime?
-
+  uuid      String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   products Product[]
 }
 
 model Product {
-  uuid       String   @id @default(uuid()) @db.Uuid
-  name       String   @db.VarChar(255)
+  uuid       String    @id @default(uuid()) @db.Uuid
+  name       String    @db.VarChar(255)
   price      Float
-  categoryId String   @db.Uuid
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  deletedAt       DateTime?
-
+  categoryId String    @db.Uuid
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
 
   category  Category   @relation(fields: [categoryId], references: [uuid])
   listItems ListItem[]
 }
 
 model List {
-  uuid      String   @id @default(uuid()) @db.Uuid
-  name      String   @db.VarChar(255)
-  userId    String   @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt       DateTime?
-
+  uuid      String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(255)
+  userId    String    @db.Uuid
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   user      Users      @relation(fields: [userId], references: [uuid])
   listItems ListItem[]
 }
 
 model ListItem {
-  uuid           String   @id @default(uuid()) @db.Uuid
+  uuid           String    @id @default(uuid()) @db.Uuid
   quantity       Int
-  productId      String   @db.Uuid
-  shoppingListId String   @db.Uuid
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  deletedAt       DateTime?
+  productId      String    @db.Uuid
+  listId String    @db.Uuid
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
-
-  product        Product  @relation(fields: [productId], references: [uuid])
-  list           List     @relation(fields: [shoppingListId], references: [uuid])
+  product Product @relation(fields: [productId], references: [uuid])
+  list    List    @relation(fields: [listId], references: [uuid])
 }
