@@ -1,0 +1,105 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  ParseIntPipe,
+  Body,
+  ParseUUIDPipe,
+  Put,
+  Delete,
+  Patch,
+} from '@nestjs/common';
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
+import { ApiTags, ApiQuery, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { {{ entity_name }}ListQuery } from '../domain/queries/list-{{ entity_name_lower }}.query';
+import { List{{ entity_name }}Dto } from '../domain/dtos/list-{{ entity_name_lower }}.dto';
+import { {{ entity_name }} } from '@prisma/client';
+import { {{ entity_name }}ByUuidQuery } from '../domain/queries/{{ entity_name_lower }}-by-uuid.query';
+import { Read{{ entity_name }}Dto } from '../domain/dtos/read-{{ entity_name_lower }}.dto';
+import { Create{{ entity_name }}Dto } from '../domain/dtos/create-{{ entity_name_lower }}.dto';
+import { Update{{ entity_name }}Dto } from '../domain/dtos/update-{{ entity_name_lower }}.dto';
+import { Update{{ entity_name }}Command } from '../domain/commands/update-{{ entity_name_lower }}.command';
+import { Create{{ entity_name }}Command } from '../domain/commands/create-{{ entity_name_lower }}.command';
+import { Delete{{ entity_name }}Command } from '../domain/commands/delete-{{ entity_name_lower }}.command';
+import { Restore{{ entity_name }}Command } from '../domain/commands/restore-{{ entity_name_lower }}.command ';
+
+@ApiTags('{{ entity_name }}')
+@Controller('{{ entity_name_lower }}')
+export class {{ entity_name }}Controller {
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+  ) {}
+
+  @Get('find-by-uuid')
+  @ApiOperation({summary: 'Get {{ entity_name }} By Uuid'})
+  @ApiQuery({ name: 'uuid', type: String, required: true })
+  async get{{ entity_name }}ByUuid(
+    @Query('uuid', ParseUUIDPipe) uuid: string,
+  ): Promise<Read{{ entity_name }}Dto> {
+    return await this.queryBus.execute<{{ entity_name }}ByUuidQuery, Read{{ entity_name }}Dto>(
+      new {{ entity_name }}ByUuidQuery(uuid),
+    );
+  }
+
+  @Get('list')
+  @ApiOperation({ summary: 'Get {{ entity_name_lower }} list and search' })
+  @ApiQuery({ name: 'page', type: Number, required: true, example: 1 })
+  @ApiQuery({ name: 'itemsPerPage', type: Number, required: true, example: 20 })
+  @ApiQuery({ name: 'search', type: String, required: false })
+  @ApiResponse({ status: 200, description: 'List of {{ entity_name_lower }}', type: List{{ entity_name }}Dto })
+  async get{{ entity_name }}List(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('itemsPerPage', ParseIntPipe) itemsPerPage: number,
+    @Query('search') search?: string,
+  ): Promise<List{{ entity_name }}Dto> {
+    return await this.queryBus.execute<{{ entity_name }}ListQuery, List{{ entity_name }}Dto>(
+      new {{ entity_name }}ListQuery(page, itemsPerPage, search),
+    );
+  }
+
+  @Post('create')
+  @ApiOperation({ summary: 'Create a new {{ entity_name_lower }}' })
+  @ApiBody({ type: Create{{ entity_name }}Dto })
+  @ApiResponse({ status: 201, description: 'The {{ entity_name_lower }} has been successfully created.', type: Read{{ entity_name }}Dto })
+  async create{{ entity_name }}(@Body() create{{ entity_name }}Dto: Create{{ entity_name }}Dto): Promise<{{ entity_name }}> {
+    return await this.commandBus.execute(
+      new Create{{ entity_name }}Command(create{{ entity_name }}Dto),
+    );
+  }
+
+  @Put('update')
+  @ApiOperation({summary: 'Update {{ entity_name }}'})
+  @ApiBody({type: Update{{ entity_name }}Dto})
+  @ApiResponse({status: 201, description:'The {{ entity_name_lower }} has been sucessfully updated.', type: Read{{ entity_name }}Dto})
+  @ApiQuery({ name: 'uuid', type: String, required: true })
+  async put{{ entity_name }}ByUuid(
+    @Query('uuid', ParseUUIDPipe) uuid: string,
+    @Body() update{{ entity_name }}Dto: Update{{ entity_name }}Dto,
+  ): Promise<Read{{ entity_name }}Dto> {
+    return await this.commandBus.execute(
+      new Update{{ entity_name }}Command(uuid, update{{ entity_name }}Dto),
+    );
+  }
+
+  @Patch('restore')
+  @ApiOperation({ summary: 'Restore an {{ entity_name_lower }}' })
+  @ApiQuery({ name: 'uuid', type: String, required: true })
+  @ApiResponse({ status: 200, description: 'The {{ entity_name_lower }} has been successfully restored.', type: Read{{ entity_name }}Dto })
+  async restore{{ entity_name }}(@Query('uuid', ParseUUIDPipe) uuid: string): Promise<Read{{ entity_name }}Dto> {
+    return await this.commandBus.execute(
+      new Restore{{ entity_name }}Command(uuid),
+    );
+  }
+
+  @Delete('soft-delete')
+  @ApiOperation({ summary: 'Soft delete an {{ entity_name_lower }}' })
+  @ApiQuery({ name: 'uuid', type: String, required: true })
+  @ApiResponse({ status: 200, description: 'The {{ entity_name_lower }} has been successfully soft deleted.', type: Read{{ entity_name }}Dto })
+  async softDelete{{ entity_name }}(@Query('uuid', ParseUUIDPipe) uuid: string): Promise<Read{{ entity_name }}Dto> {
+    return await this.commandBus.execute(
+      new Delete{{ entity_name }}Command(uuid),
+    );
+  }
+}

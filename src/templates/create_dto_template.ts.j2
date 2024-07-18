@@ -1,0 +1,30 @@
+import { IsString, IsEmail, IsEnum, IsOptional, IsInt } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { {{ entity_name }}Type } from '@prisma/client';
+
+export class Create{{ entity_name }}Dto {
+  @ApiProperty({ example: 'John Doe' })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: 'john.doe@example.com' })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ example: 'securepassword' })
+  @IsString()
+  password: string;
+
+  @ApiProperty({ example: {{ entity_name }}Type.user, enum: {{ entity_name }}Type })
+  @IsEnum({{ entity_name }}Type)
+  {{ entity_name_lower }}Type: {{ entity_name }}Type;
+
+  @ApiProperty({ example: 'http://example.com/profile.jpg', required: false })
+  @IsOptional()
+  @IsString()
+  profileImageUrl?: string;
+
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  role: number;
+}

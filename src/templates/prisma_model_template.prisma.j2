@@ -1,0 +1,9 @@
+model {{ entity_name }} {
+  uuid            String    @id @default(uuid()) @db.Uuid
+  name            String    @db.VarChar(255)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  @@map("{{ entity_name }}")
+}
