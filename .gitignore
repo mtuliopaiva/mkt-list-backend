@@ -4,6 +4,7 @@
 /build
 
 /src/utils/create_entity.py
+/src/template
 
 # Logs
 logs
