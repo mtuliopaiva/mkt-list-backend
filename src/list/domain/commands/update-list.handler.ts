@@ -1,32 +1,33 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UpdateProductCommand } from "./update-list.command";
+import { UpdateListCommand } from "./update-list.command";
 import { BaseHttpException } from "src/core/exceptions/http-base.exceptions";
 import { ProductService } from "src/product/services/product.service";
-import { ReadProductDto } from "../dtos/read-product.dto";
+import { ReadListDto } from "../dtos/read-list.dto";
+import { ListService } from "src/list/services/list.service";
 
 
-@CommandHandler(UpdateProductCommand)
-export class UpdateProductHandler
+@CommandHandler(UpdateListCommand)
+export class UpdateListHandler
   extends BaseHttpException
-  implements ICommandHandler<UpdateProductCommand>
+  implements ICommandHandler<UpdateListCommand>
 {
-  constructor(private readonly productService: ProductService) {
+  constructor(private readonly listService: ListService) {
     super();
   }
 
-  async execute(command: UpdateProductCommand): Promise<ReadProductDto> {
+  async execute(command: UpdateListCommand): Promise<ReadListDto> {
 
-    const { uuid, updateProductDto } = command;
+    const { uuid, updateListDto } = command;
 
-    const productData = await this.productService.updateProduct(uuid, updateProductDto);
+    const listData = await this.listService.updateList(uuid, updateListDto);
 
 
-    return <ReadProductDto>{
-      uuid: productData.uuid,
-      name: productData.name,
-      createdAt: productData.createdAt,
-      updatedAt: productData.updatedAt,
-      deletedAt: productData.deletedAt,
+    return <ReadListDto>{
+      uuid: listData.uuid,
+      name: listData.name,
+      createdAt: listData.createdAt,
+      updatedAt: listData.updatedAt,
+      deletedAt: listData.deletedAt,
     };
   }
 }

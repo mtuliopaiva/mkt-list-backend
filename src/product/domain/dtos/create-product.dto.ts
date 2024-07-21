@@ -12,7 +12,7 @@ export class CreateProductDto {
 
   @ApiProperty({ example: 'c1b8f8c2-9f8d-4b9b-8e9d-4c9b8f8d9e9d' })
   @IsUUID()
-  categoryId: string;
+  categoryUuid: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

@@ -1,21 +1,21 @@
 import { Controller, Post, Body, Put, Query, ParseUUIDPipe, Patch, Delete, Get, ParseIntPipe } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiTags, ApiBody, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { Product } from '@prisma/client';
-import { CreateListDto } from '../domain/dtos/create-product.dto';
-import { ReadListDto } from '../domain/dtos/read-product.dto';
-import { CreateProductCommand } from '../domain/commands/create-list.command';
-import { UpdateProductDto } from '../domain/dtos/update-product.dto';
-import { UpdateProductCommand } from '../domain/commands/update-list.command';
-import { DeleteProductCommand } from '../domain/commands/delete-list.command';
-import { RestoreProductCommand } from '../domain/commands/restore-list.command ';
-import { ProductByUuidQuery } from '../domain/queries/product-by-uuid.query';
-import { ListListDto } from '../domain/dtos/list-product.dto';
-import { ProductListQuery } from '../domain/queries/list-category.query';
+import { ReadListDto } from '../domain/dtos/read-list.dto';
+import { ListByUuidQuery } from '../domain/queries/list-by-uuid.query';
+import { ListListDto } from '../domain/dtos/list-list.dto';
+import { ListListQuery } from '../domain/queries/list-list.query';
+import { CreateListDto } from '../domain/dtos/create-list.dto';
+import { CreateListCommand } from '../domain/commands/create-list.command';
+import { UpdateListDto } from '../domain/dtos/update-list.dto';
+import { List } from '@prisma/client';
+import { UpdateListCommand } from '../domain/commands/update-list.command';
+import { DeleteListCommand } from '../domain/commands/delete-list.command';
+import { RestoreListCommand } from '../domain/commands/restore-list.command ';
 
-@ApiTags('Product')
-@Controller('product')
-export class ProductController {
+@ApiTags('List')
+@Controller('list')
+export class ListController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
@@ -38,7 +38,7 @@ export class ProductController {
   @ApiQuery({ name: 'itemsPerPage', type: Number, required: true, example: 20 })
   @ApiQuery({ name: 'search', type: String, required: false })
   @ApiResponse({ status: 200, description: 'List of lists', type: ListListDto })
-  async getListAndList(
+  async getListAndListAndSearch(
     @Query('page', ParseIntPipe) page: number,
     @Query('itemsPerPage', ParseIntPipe) itemsPerPage: number,
     @Query('search') search?: string,
@@ -47,14 +47,14 @@ export class ProductController {
       new ListListQuery(page, itemsPerPage, search),
     );
   }
-  
+
   @Post('create')
   @ApiOperation({ summary: 'Create a new list' })
   @ApiBody({ type: CreateListDto })
   @ApiResponse({ status: 201, description: 'The List has been successfully created.', type: ReadListDto })
-  async createList(@Body() createListDto: CreateListDto): Promise<Product> {
+  async createList(@Body() createListDto: CreateListDto): Promise<List> {
     return await this.commandBus.execute(
-      new CreateProductCommand(createListDto),
+      new CreateListCommand(createListDto),
     );
   }
 
@@ -91,5 +91,4 @@ export class ProductController {
       new DeleteListCommand(uuid),
     );
   }
-
 }

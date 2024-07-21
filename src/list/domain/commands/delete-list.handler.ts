@@ -1,6 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BaseHttpException } from 'src/core/exceptions/http-base.exceptions';
 import { DeleteListCommand } from './delete-list.command';
+import { ListService } from 'src/list/services/list.service';
+import { ReadListDto } from '../dtos/read-list.dto';
 
 @CommandHandler(DeleteListCommand)
 export class SoftDeleteListHandler
@@ -14,7 +16,7 @@ export class SoftDeleteListHandler
   async execute(command: DeleteListCommand): Promise<ReadListDto> {
     const { uuid } = command;
 
-    const listData = await this.listService.softDeleteProduct(uuid);
+    const listData = await this.listService.softDeleteList(uuid);
 
     return<ReadListDto> {
       uuid: listData.uuid,

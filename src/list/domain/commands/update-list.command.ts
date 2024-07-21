@@ -1,9 +1,9 @@
 import { ICommand } from '@nestjs/cqrs';
-import { UpdateProductDto } from '../dtos/update-product.dto';
+import { UpdateListDto } from '../dtos/update-list.dto';
 
-export class UpdateProductCommand implements ICommand {
+export class UpdateListCommand implements ICommand {
   constructor(
     public readonly uuid: string,
-    public readonly updateProductDto: UpdateProductDto
+    public readonly updateListDto: UpdateListDto
   ) {}
 }

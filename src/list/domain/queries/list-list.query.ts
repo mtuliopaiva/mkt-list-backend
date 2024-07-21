@@ -1,6 +1,6 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class ProductListQuery implements IQuery {
+export class ListListQuery implements IQuery {
   constructor(
     public readonly page: number,
     public readonly itemsPerPage: number,

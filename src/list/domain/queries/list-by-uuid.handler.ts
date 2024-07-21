@@ -1,25 +1,26 @@
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { BaseHttpException } from "src/core/exceptions/http-base.exceptions";
-import { RestoreListCommand } from "./restore-list.command ";
 import { ReadListDto } from "../dtos/read-list.dto";
 import { ListService } from "src/list/services/list.service";
+import { ListByUuidQuery } from "./list-by-uuid.query";
 
-
-@CommandHandler(RestoreListCommand)
-export class RestoreListHandler
+@QueryHandler(ListByUuidQuery)
+export class ListByUuidHandler
   extends BaseHttpException
-  implements ICommandHandler<RestoreListCommand>
+  implements IQueryHandler<ListByUuidQuery>
 {
   constructor(private readonly listService: ListService) {
     super();
   }
 
-  async execute(command: RestoreListCommand): Promise<ReadListDto> {
+  async execute(query: ListByUuidQuery): Promise<ReadListDto> {
+    const { uuid } = query;
 
-    const { uuid } = command;
+    const listData = await this.listService.getListByUuid(uuid);
 
-    const listData = await this.listService.restoreList(uuid);
-
+    if (!listData) {
+      throw new Error('Product not found');
+    }
 
     return <ReadListDto>{
       uuid: listData.uuid,
@@ -27,6 +28,6 @@ export class RestoreListHandler
       createdAt: listData.createdAt,
       updatedAt: listData.updatedAt,
       deletedAt: listData.deletedAt,
-    };
+    }
   }
 }
