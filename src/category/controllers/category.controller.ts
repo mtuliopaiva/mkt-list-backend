@@ -9,9 +9,10 @@ import {
   Put,
   Delete,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { ApiTags, ApiQuery, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiQuery, ApiBody, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CategoryListQuery } from '../domain/queries/list-category.query';
 import { ListCategoryDto } from '../domain/dtos/list-category.dto';
 import { Category } from '@prisma/client';
@@ -23,6 +24,7 @@ import { UpdateCategoryCommand } from '../domain/commands/update-category.comman
 import { CreateCategoryCommand } from '../domain/commands/create-category.command';
 import { DeleteCategoryCommand } from '../domain/commands/delete-category.command';
 import { RestoreCategoryCommand } from '../domain/commands/restore-category.command ';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('Category')
 @Controller('category')
@@ -32,6 +34,9 @@ export class CategoryController {
     private readonly commandBus: CommandBus,
   ) {}
 
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('find-by-uuid')
   @ApiOperation({summary: 'Get Category By Uuid'})
   @ApiQuery({ name: 'uuid', type: String, required: true })
@@ -43,6 +48,8 @@ export class CategoryController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('list')
   @ApiOperation({ summary: 'Get category list and search' })
   @ApiQuery({ name: 'page', type: Number, required: true, example: 1 })
@@ -59,6 +66,8 @@ export class CategoryController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   @ApiOperation({ summary: 'Create a new category' })
   @ApiBody({ type: CreateCategoryDto })
@@ -68,7 +77,9 @@ export class CategoryController {
       new CreateCategoryCommand(createCategoryDto),
     );
   }
-
+  
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Put('update')
   @ApiOperation({summary: 'Update category'})
   @ApiBody({type: UpdateCategoryDto})
@@ -83,6 +94,8 @@ export class CategoryController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('restore')
   @ApiOperation({ summary: 'Restore a category' })
   @ApiQuery({ name: 'uuid', type: String, required: true })
@@ -92,7 +105,9 @@ export class CategoryController {
       new RestoreCategoryCommand(uuid),
     );
   }
-
+  
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('soft-delete')
   @ApiOperation({ summary: 'Soft delete a category' })
   @ApiQuery({ name: 'uuid', type: String, required: true })

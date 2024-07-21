@@ -15,11 +15,17 @@ export class UsersService {
   async getUserByUuid(uuid: string): Promise<Users> {
     try {
       return await this.prisma.users.findUnique({
-        where: {uuid}
-      })
+        where: { uuid },
+      });
     } catch (error) {
       throw new Error(`Error fetching users: ${error.message}`);
     }
+  }
+
+  async findOneByEmail(email: string): Promise<Users | null> {
+    return this.prisma.users.findUnique({
+      where: { email },
+    });
   }
 
   async getUserList(
@@ -66,7 +72,6 @@ export class UsersService {
     }
   }
 
-
   async putUser(uuid: string, data: UpdateUsersDto): Promise<Users> {
     try {
       return await this.prisma.users.update({
@@ -81,7 +86,7 @@ export class UsersService {
   async restoreUser(uuid: string): Promise<Users> {
     try {
       const user = await this.prisma.users.findUnique({
-        where: {uuid}
+        where: { uuid },
       });
 
       if (!user || !user.deletedAt) {
@@ -90,7 +95,7 @@ export class UsersService {
 
       return await this.prisma.users.update({
         where: { uuid },
-        data:{deletedAt: null}
+        data: { deletedAt: null },
       });
     } catch (error) {
       throw new Error(`Error updating user: ${error.message}`);

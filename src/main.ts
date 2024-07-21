@@ -5,6 +5,10 @@ import * as webpack from 'webpack';
 import * as webpackDevMiddleware from 'webpack-dev-middleware';
 import * as webpackHotMiddleware from 'webpack-hot-middleware';
 import * as webpackConfig from '../webpack.config';
+import * as dotenv from 'dotenv'
+
+dotenv.config()
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,9 +27,11 @@ async function bootstrap() {
     .setTitle('API - Market List')
     .setDescription('API documentation for the application')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  document.components.schemas = {};
   SwaggerModule.setup('/', app, document);
 
   await app.listen(3000);
