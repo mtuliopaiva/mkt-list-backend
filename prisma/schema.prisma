@@ -13,6 +13,18 @@ enum UserType {
   user
 }
 
+model Audits {
+  Uuid       String   @id @default(uuid()) @db.Uuid
+  action     String
+  entityName String
+  oldValue   String?
+  newValue   String?
+  userUuid   String?
+  timestamp  DateTime @default(now())
+
+  @@map("audits")
+}
+
 model Permissions {
   uuid        String    @id @default(uuid()) @db.Uuid
   name        String
@@ -69,37 +81,37 @@ model Category {
 }
 
 model Product {
-  uuid       String    @id @default(uuid()) @db.Uuid
-  name       String    @db.VarChar(255)
-  price      Float
+  uuid         String    @id @default(uuid()) @db.Uuid
+  name         String    @db.VarChar(255)
+  price        Float
   categoryUuid String    @db.Uuid
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
 
-  category  Category   @relation(fields: [categoryUuid], references: [uuid])
-  lists     ListOnProduct[]
+  category Category        @relation(fields: [categoryUuid], references: [uuid])
+  lists    ListOnProduct[]
 }
 
 model List {
   uuid      String    @id @default(uuid()) @db.Uuid
   name      String    @db.VarChar(255)
-  userUuid    String    @db.Uuid
+  userUuid  String    @db.Uuid
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  user      Users          @relation(fields: [userUuid], references: [uuid])
-  products  ListOnProduct[]
+  user     Users           @relation(fields: [userUuid], references: [uuid])
+  products ListOnProduct[]
 }
 
 model ListOnProduct {
-  listUuid     String   @db.Uuid
-  productId  String   @db.Uuid
-  quantity   Int
+  listUuid  String @db.Uuid
+  productId String @db.Uuid
+  quantity  Int
 
-  list     List     @relation(fields: [listUuid], references: [uuid])
-  product  Product  @relation(fields: [productId], references: [uuid])
+  list    List    @relation(fields: [listUuid], references: [uuid])
+  product Product @relation(fields: [productId], references: [uuid])
 
   @@id([listUuid, productId])
   @@map("list_on_product")
